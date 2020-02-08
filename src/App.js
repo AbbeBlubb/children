@@ -7,10 +7,10 @@ export default function App() {
       <header className="App-header">
         Children component names
       </header>
-
       <p>
-         Markup order of children components: Paragraph, One, Two, Three, Class<br/>
-        Parent will render children components in different order
+        Markup order of children components: parraf, One, Two, Three, Class<br/>
+        Parent will select components by name (excluding elements, texts, functions)<br/>
+        and render selected children components in different order
       </p>
 
       <Parent>
@@ -38,10 +38,12 @@ export default function App() {
 export class Parent extends React.Component {
 
   getChildrenComponent = name => {
-    // Cero children: props.children = undefined
-    // One child: props.children = {}
-    // Several children: props.children = [{}, {}, ...]
+    // Zero children: props.children = undefined
+    // One child: props.children = {...}
+    // If the one child is a string: props.children = 'the-string'
+    // Several children: props.children = [{...}, {...}, ...]
     // With React.Children.toArray, the output is always an array: empty (truthy) or with one or more objects
+    console.log('props.children as-is: ', this.props.children);
     console.log('props.children toArray: ', React.Children.toArray(this.props.children));
 
     let component = null;
@@ -50,7 +52,8 @@ export class Parent extends React.Component {
       console.log('Child object: ', child);
 
       if(
-        // Exclude empty array
+        // Exclude empty .toArray.
+        // If not using .toArray and using .length of props.children as-is and children is a string, the .length will give the string length
         (React.Children.toArray(this.props.children).length > 0) &&
         // Must be a React component or a React element (HTML element), excludes eg. text
         (React.isValidElement(child)) &&
