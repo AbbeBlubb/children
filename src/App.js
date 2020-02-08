@@ -50,9 +50,13 @@ export class Parent extends React.Component {
       console.log('Child object: ', child);
 
       if(
+        // Exclude empty array
         (React.Children.toArray(this.props.children).length > 0) &&
-        (React.isValidElement(child)) && // Must be a React element like a component or a HTML element, not text
-        (typeof child.type === 'function') && // The element must be a function, excludes HTML elements
+        // Must be a React component or a React element (HTML element), excludes eg. text
+        (React.isValidElement(child)) &&
+        // Must be a function, excludes HTML elements = it's a React component
+        (typeof child.type === 'function') &&
+        // A React component has it's name in type.name
         (child.type.name === name)){
 
           component = child;
