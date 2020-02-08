@@ -5,12 +5,12 @@ export default function App() {
   return (
     <div className="App">
       <header className="App-header">
-        Children names
+        Children component names
       </header>
 
       <p>
-         Markup order of childs: Paragraph, One, Two, Three, Class<br/>
-        Parent will render childs in different order
+         Markup order of children components: Paragraph, One, Two, Three, Class<br/>
+        Parent will render children components in different order
       </p>
 
       <Parent>
@@ -37,45 +37,41 @@ export default function App() {
 
 export class Parent extends React.Component {
 
-  getComponentName = name => {
-    // Cero children: undefined
-    // One or more children: props.children = {}
+  getChildrenComponent = name => {
+    // Cero children: props.children = undefined
+    // One child: props.children = {}
+    // Several children: props.children = [{}, {}, ...]
     // With React.Children.toArray, the output is always an array: empty (truthy) or with one or more objects
-    console.log('props.children as is: ', this.props.children);
     console.log('props.children toArray: ', React.Children.toArray(this.props.children));
 
-    let childIndex = false;
+    let component = null;
 
     React.Children.forEach(React.Children.toArray(this.props.children), child => {
       console.log('Child object: ', child);
 
       if(
         (React.Children.toArray(this.props.children).length > 0) &&
-        (React.isValidElement(child)) &&
-        //(typeof child.type === 'function') &&
+        (React.isValidElement(child)) && // Must be a React element like a component or a HTML element, not text
+        (typeof child.type === 'function') && // The element must be a function, excludes HTML elements
         (child.type.name === name)){
 
-          childIndex = child.key.substring(1);
-          console.log('Funcion (React Component) name: ', child.type.name);
+          component = child;
+          console.log('React Component name: ', child.type.name);
       }
     });
-    return childIndex;
+    return component;
   };
 
   render() {
     return(
-      <div>
+      <>
         {
-          this.getComponentName('ClassChildContainer')
-            ? this.props.children[this.getComponentName('ClassChildContainer')]
-            : 'Negative searach'
+          this.getChildrenComponent('ClassChildContainer')
         }
         {
-          this.getComponentName('ChildContainerTwo')
-            ? this.props.children[this.getComponentName('ChildContainerTwo')]
-            : 'Negative searach'
+          this.getChildrenComponent('ChildContainerTwo')
         }
-      </div>
+      </>
     );
   }
 };
