@@ -8,30 +8,27 @@ export default function App() {
         Children names
       </header>
 
+      <p>
+         Markup order of childs: Paragraph, One, Two, Three, Class<br/>
+        Parent will render childs in different order
+      </p>
+
       <Parent>
-
         <p>
-          ChildContainer order in JSX: One, Two, Three, Class<br/>
-          Parent renders in other order<br/>
-          This is a child as well, a /P/
+          Paragraph
         </p>
-
         <ChildContainerOne>
-          First child content
+          One
         </ChildContainerOne>
-
         <ChildContainerTwo>
-          Second child content
+          Two
         </ChildContainerTwo>
-
         <ChildContainerThree>
-          Third child content
+          Three
         </ChildContainerThree>
-
         <ClassChildContainer>
-          Content to class component
+          Class
         </ClassChildContainer>
-
       </Parent>
 
     </div>
@@ -41,33 +38,42 @@ export default function App() {
 export class Parent extends React.Component {
 
   getComponentName = name => {
-    console.log(this.props.children)
-    console.log(React.Children.toArray(this.props.children))
-    
-    let b = false;
+    // Cero children: undefined
+    // One or more children: props.children = {}
+    // With React.Children.toArray, the output is always an array: empty (truthy) or with one or more objects
+    console.log('props.children as is: ', this.props.children);
+    console.log('props.children toArray: ', React.Children.toArray(this.props.children));
+
+    let childIndex = false;
 
     React.Children.forEach(React.Children.toArray(this.props.children), child => {
       console.log('Child object: ', child);
 
-      if((typeof child.type === 'function') && (child.type.name === name)){
-        console.log('Funcion (React Component) name: ', child.type.name);
-        const a = child.key;
-        console.log('return: ', a.substring(1))
-        b = a.substring(1)
-        return b
+      if(
+        (React.Children.toArray(this.props.children).length > 0) &&
+        (React.isValidElement(child)) &&
+        //(typeof child.type === 'function') &&
+        (child.type.name === name)){
+
+          childIndex = child.key.substring(1);
+          console.log('Funcion (React Component) name: ', child.type.name);
       }
     });
-    return b
+    return childIndex;
   };
 
   render() {
     return(
       <div>
-        {this.props.children[1]}
         {
-          this.getComponentName('ChildContainerThree')
-            ? this.props.children[this.getComponentName('ChildContainerThree')]
-            : 'hm'
+          this.getComponentName('ClassChildContainer')
+            ? this.props.children[this.getComponentName('ClassChildContainer')]
+            : 'Negative searach'
+        }
+        {
+          this.getComponentName('ChildContainerTwo')
+            ? this.props.children[this.getComponentName('ChildContainerTwo')]
+            : 'Negative searach'
         }
       </div>
     );
@@ -99,7 +105,6 @@ export const ChildContainerThree = props => {
 };
 
 export class ClassChildContainer extends React.Component {
-
   render() {
     return(
       <div>
@@ -107,4 +112,4 @@ export class ClassChildContainer extends React.Component {
       </div>
     );
   }
-}
+};
