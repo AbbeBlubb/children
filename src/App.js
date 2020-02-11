@@ -31,6 +31,16 @@ export default function App() {
         </ClassChildContainer>
       </Parent>
 
+      <p>
+        Or give the component a new property to use for selection
+      </p>
+
+      <Parent>
+        <GiveProperty>
+          New property
+        </GiveProperty>
+      </Parent>
+
     </div>
   );
 };
@@ -69,6 +79,27 @@ export class Parent extends React.Component {
     return component;
   };
 
+  // If the React Component doesn't have a child.type.name (if it's just an empty string), then give it a new property to use as identification
+  getComponentByGivenProperty = name => {
+    let component = null;
+
+    React.Children.forEach(React.Children.toArray(this.props.children), child => {
+
+      if((React.Children.toArray(this.props.children).length > 0) &&
+        (React.isValidElement(child)) &&
+        (typeof child.type === 'function') &&
+        // Check if the component has the property you gave it
+        child.type.displayName &&
+        // Select the component by it's given property
+        (child.type.displayName === name)){
+
+          component = child;
+          console.log('React Component name: ', child.type.displayName);
+      }
+    });
+    return component;
+  }
+
   render() {
     return(
       <>
@@ -77,6 +108,9 @@ export class Parent extends React.Component {
         }
         {
           this.getChildrenComponent('ChildContainerTwo')
+        }
+        {
+          this.getComponentByGivenProperty('MyNewName')
         }
       </>
     );
@@ -116,3 +150,7 @@ export class ClassChildContainer extends React.Component {
     );
   }
 };
+
+export const GiveProperty = props => <div className='give-property'>{props.children}</div>;
+// Give it a property wich a value to use as identification. Works with funcional and class components
+GiveProperty.displayName = 'MyNewName';
